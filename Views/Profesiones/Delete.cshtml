@@ -1,0 +1,30 @@
+﻿@model personapi_dotnet.Models.Entities.Profesion
+
+@{
+    ViewData["Title"] = "Eliminar Profesión";
+}
+
+<h1>Eliminar Profesión</h1>
+
+<h4>¿Está seguro de eliminar esta profesión?</h4>
+
+<table class="table table-bordered">
+    <tr>
+        <th>ID</th>
+        <td>@Model.Id</td>
+    </tr>
+    <tr>
+        <th>Nombre</th>
+        <td>@Model.Nom</td>
+    </tr>
+    <tr>
+        <th>Descripción</th>
+        <td>@Model.Des</td>
+    </tr>
+</table>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -9,6 +9,8 @@ builder.Services.AddDbContext<PersonaDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("PersonaDbConnection")));
 
 builder.Services.AddScoped<IPersonaRepository, PersonaRepository>();
+builder.Services.AddScoped<IProfesionRepository, ProfesionRepository>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
