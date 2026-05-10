@@ -13,15 +13,26 @@ builder.Services.AddScoped<IProfesionRepository, ProfesionRepository>();
 builder.Services.AddScoped<ITelefonoRepository, TelefonoRepository>();
 builder.Services.AddScoped<IEstudioRepository, EstudioRepository>();
 
-// Add services to the container.
+// Servicios MVC
 builder.Services.AddControllersWithViews();
+
+// Servicios API REST y Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuración del pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
+}
+
+// Swagger en ambiente de desarrollo
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseStaticFiles();
@@ -30,8 +41,12 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+// Ruta MVC
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Ruta API REST
+app.MapControllers();
 
 app.Run();
