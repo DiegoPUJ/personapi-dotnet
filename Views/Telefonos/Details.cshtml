@@ -1,0 +1,34 @@
+﻿@model personapi_dotnet.Models.Entities.Telefono
+
+@{
+    ViewData["Title"] = "Detalles Teléfono";
+}
+
+<h1>Detalles de Teléfono</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Número</th>
+        <td>@Model.Num</td>
+    </tr>
+    <tr>
+        <th>Operador</th>
+        <td>@Model.Oper</td>
+    </tr>
+    <tr>
+        <th>Dueño</th>
+        <td>@Model.Duenio</td>
+    </tr>
+    <tr>
+        <th>Persona</th>
+        <td>
+            @if (Model.DuenioNavigation != null)
+            {
+                @($"{Model.DuenioNavigation.Nombre} {Model.DuenioNavigation.Apellido}")
+            }
+        </td>
+    </tr>
+</table>
+
+<a asp-action="Edit" asp-route-id="@Model.Num" class="btn btn-warning">Editar</a>
+<a asp-action="Index" class="btn btn-secondary">Volver</a>

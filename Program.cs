@@ -10,6 +10,7 @@ builder.Services.AddDbContext<PersonaDbContext>(options =>
 
 builder.Services.AddScoped<IPersonaRepository, PersonaRepository>();
 builder.Services.AddScoped<IProfesionRepository, ProfesionRepository>();
+builder.Services.AddScoped<ITelefonoRepository, TelefonoRepository>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
