@@ -1,0 +1,56 @@
+﻿@model personapi_dotnet.Models.Entities.Estudio
+
+@{
+    ViewData["Title"] = "Detalles Estudio";
+}
+
+<h1>Detalles de Estudio</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th>ID Profesión</th>
+        <td>@Model.IdProf</td>
+    </tr>
+
+    <tr>
+        <th>Profesión</th>
+        <td>
+            @if (Model.IdProfNavigation != null)
+            {
+                @Model.IdProfNavigation.Nom
+            }
+        </td>
+    </tr>
+
+    <tr>
+        <th>Cédula Persona</th>
+        <td>@Model.CcPer</td>
+    </tr>
+
+    <tr>
+        <th>Persona</th>
+        <td>
+            @if (Model.CcPerNavigation != null)
+            {
+                @($"{Model.CcPerNavigation.Nombre} {Model.CcPerNavigation.Apellido}")
+            }
+        </td>
+    </tr>
+
+    <tr>
+        <th>Fecha</th>
+        <td>@Model.Fecha?.ToString("yyyy-MM-dd")</td>
+    </tr>
+
+    <tr>
+        <th>Universidad</th>
+        <td>@Model.Univer</td>
+    </tr>
+</table>
+
+<a asp-action="Edit"
+   asp-route-idProf="@Model.IdProf"
+   asp-route-ccPer="@Model.CcPer"
+   class="btn btn-warning">Editar</a>
+
+<a asp-action="Index" class="btn btn-secondary">Volver</a>

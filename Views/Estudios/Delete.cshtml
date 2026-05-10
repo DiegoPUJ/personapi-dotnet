@@ -1,0 +1,59 @@
+﻿@model personapi_dotnet.Models.Entities.Estudio
+
+@{
+    ViewData["Title"] = "Eliminar Estudio";
+}
+
+<h1>Eliminar Estudio</h1>
+
+<h4>¿Está seguro de eliminar este estudio?</h4>
+
+<table class="table table-bordered">
+    <tr>
+        <th>ID Profesión</th>
+        <td>@Model.IdProf</td>
+    </tr>
+
+    <tr>
+        <th>Profesión</th>
+        <td>
+            @if (Model.IdProfNavigation != null)
+            {
+                @Model.IdProfNavigation.Nom
+            }
+        </td>
+    </tr>
+
+    <tr>
+        <th>Cédula Persona</th>
+        <td>@Model.CcPer</td>
+    </tr>
+
+    <tr>
+        <th>Persona</th>
+        <td>
+            @if (Model.CcPerNavigation != null)
+            {
+                @($"{Model.CcPerNavigation.Nombre} {Model.CcPerNavigation.Apellido}")
+            }
+        </td>
+    </tr>
+
+    <tr>
+        <th>Fecha</th>
+        <td>@Model.Fecha?.ToString("yyyy-MM-dd")</td>
+    </tr>
+
+    <tr>
+        <th>Universidad</th>
+        <td>@Model.Univer</td>
+    </tr>
+</table>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="IdProf" />
+    <input type="hidden" asp-for="CcPer" />
+
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -1,0 +1,68 @@
+﻿@model IEnumerable<personapi_dotnet.Models.Entities.Estudio>
+
+@{
+    ViewData["Title"] = "Estudios";
+}
+
+<h1>Listado de Estudios</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear nuevo estudio</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID Profesión</th>
+            <th>Profesión</th>
+            <th>Cédula Persona</th>
+            <th>Persona</th>
+            <th>Fecha</th>
+            <th>Universidad</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.IdProf</td>
+                <td>
+                    @if (item.IdProfNavigation != null)
+                    {
+                        @item.IdProfNavigation.Nom
+                    }
+                </td>
+
+                <td>@item.CcPer</td>
+                <td>
+                    @if (item.CcPerNavigation != null)
+                    {
+                        @($"{item.CcPerNavigation.Nombre} {item.CcPerNavigation.Apellido}")
+                    }
+                </td>
+
+                <td>@item.Fecha?.ToString("yyyy-MM-dd")</td>
+                <td>@item.Univer</td>
+
+                <td>
+                    <a asp-action="Details"
+                       asp-route-idProf="@item.IdProf"
+                       asp-route-ccPer="@item.CcPer"
+                       class="btn btn-info btn-sm">Detalles</a>
+
+                    <a asp-action="Edit"
+                       asp-route-idProf="@item.IdProf"
+                       asp-route-ccPer="@item.CcPer"
+                       class="btn btn-warning btn-sm">Editar</a>
+
+                    <a asp-action="Delete"
+                       asp-route-idProf="@item.IdProf"
+                       asp-route-ccPer="@item.CcPer"
+                       class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

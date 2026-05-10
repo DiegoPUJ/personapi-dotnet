@@ -11,6 +11,7 @@ builder.Services.AddDbContext<PersonaDbContext>(options =>
 builder.Services.AddScoped<IPersonaRepository, PersonaRepository>();
 builder.Services.AddScoped<IProfesionRepository, ProfesionRepository>();
 builder.Services.AddScoped<ITelefonoRepository, TelefonoRepository>();
+builder.Services.AddScoped<IEstudioRepository, EstudioRepository>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
