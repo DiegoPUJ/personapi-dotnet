@@ -25,7 +25,7 @@ Además de las vistas MVC, el proyecto incluye endpoints REST documentados con S
 - [Control de versiones](#control-de-versiones)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Estado del laboratorio](#estado-del-laboratorio)
-- [Autor](#autor)
+- [Autores](#autores)
 
 ---
 
@@ -96,7 +96,7 @@ Para ejecutar el proyecto se requiere tener instalado:
 - SQL Server Express o SQL Server 2022
 - SQL Server Management Studio
 - Git
-- Docker Desktop, opcional para validar el Dockerfile
+- Docker Desktop
 - Cloudflare Tunnel, opcional para exponer temporalmente la aplicación local
 
 ---
@@ -328,17 +328,41 @@ Desde la raíz del proyecto:
 docker build -t personapi-dotnet .
 ```
 
+La imagen fue construida correctamente y quedó registrada como:
+
+```text
+personapi-dotnet:latest
+```
+
+### Verificación de imagen creada
+
+Para verificar que la imagen existe localmente:
+
+```bash
+docker images
+```
+
+En la lista de imágenes debe aparecer:
+
+```text
+personapi-dotnet    latest
+```
+
 ### Ejecución del contenedor
+
+La aplicación fue ejecutada en contenedor mediante el siguiente comando:
 
 ```bash
 docker run -p 8080:80 personapi-dotnet
 ```
 
-La aplicación quedaría disponible en:
+La aplicación quedó disponible desde Docker en:
 
 ```text
 http://localhost:8080
 ```
+
+Con esto se validó correctamente la construcción y ejecución inicial de la imagen Docker.
 
 ### Nota sobre conexión a base de datos en Docker
 
@@ -352,7 +376,7 @@ Esta cadena funciona cuando la aplicación corre directamente en el equipo donde
 
 Si la aplicación se ejecuta dentro de Docker, la cadena de conexión debe ajustarse para apuntar a un servidor SQL Server accesible desde el contenedor. Por ejemplo, podría usarse una instancia SQL Server en otro contenedor, una IP del equipo anfitrión o una base de datos remota.
 
-Por esta razón, el `Dockerfile` permite construir la imagen de la aplicación, pero la ejecución completa con base de datos requiere configurar correctamente la conectividad hacia SQL Server.
+Por esta razón, aunque la aplicación inicia correctamente desde Docker, la operación completa con base de datos requiere configurar la conectividad hacia SQL Server si se desea ejecutar todo el sistema desde contenedores.
 
 ---
 
@@ -422,6 +446,7 @@ Durante el desarrollo se realizaron commits por cada avance principal:
 - Creación del script `database.sql`.
 - Actualización de documentación en README.
 - Exposición temporal de la aplicación mediante Cloudflare Tunnel.
+- Validación del Dockerfile mediante construcción y ejecución de imagen Docker.
 
 ---
 
@@ -495,19 +520,20 @@ personapi-dotnet/
 | Vistas CRUD | Completado |
 | Endpoints REST | Completado |
 | Swagger | Completado |
-| Dockerfile | Incluido para validación |
+| Dockerfile | Validado correctamente mediante construcción y ejecución de imagen Docker |
 | Documentación README | Completado |
 | Despliegue local | Completado |
 | Túnel público temporal | Completado |
+| Código fuente en GitHub | Completado |
 | TAG final | Pendiente |
 
 ---
 
-## Autor
+## Autores
 
 Desarrollado por:
 
-**Diego Martinez, Juliana Bejarano y Sebastián Almanza  **
+**Diego Martinez, Juliana Bejarano y Sebastián Almanza**
 
 Laboratorio 1 de Arquitectura de Software.
 
