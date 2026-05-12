@@ -15,7 +15,7 @@ Además de las vistas MVC, el proyecto incluye endpoints REST documentados con S
 - [Modelo de datos](#modelo-de-datos)
 - [Requisitos previos](#requisitos-previos)
 - [Configuración de la base de datos](#configuración-de-la-base-de-datos)
-- [Configuración del proyecto](#configuración-del-proyecto)
+- [Configuración por ambiente](#configuración-por-ambiente)
 - [Ejecución local](#ejecución-local)
 - [Rutas MVC](#rutas-mvc)
 - [Endpoints REST](#endpoints-rest)
@@ -134,20 +134,32 @@ estudios
 
 ---
 
-## Configuración del proyecto
+## Configuración por ambiente
 
-La cadena de conexión se encuentra configurada en el archivo:
+El proyecto separa la configuración general de la configuración local de desarrollo.
 
-```text
-appsettings.json
+La aplicación obtiene la cadena de conexión desde `Program.cs` mediante:
+
+```csharp
+builder.Configuration.GetConnectionString("PersonaDbConnection")
 ```
 
-Para este laboratorio se usó SQL Server Express local con autenticación integrada de Windows:
+Esto permite cambiar la conexión según el ambiente sin modificar el código fuente.
+
+### Archivo `appsettings.json`
+
+El archivo `appsettings.json` contiene una cadena de conexión genérica para despliegue o configuración mediante variables de entorno:
 
 ```json
 {
   "ConnectionStrings": {
-    "PersonaDbConnection": "Server=localhost\\SQLEXPRESS;Database=persona_db;Trusted_Connection=True;TrustServerCertificate=True"
+    "PersonaDbConnection": "Server=SQL_SERVER_HOST;Database=persona_db;User Id=SQL_USER;Password=SQL_PASSWORD;TrustServerCertificate=True"
+  },
+
+  "ApplicationUrls": {
+    "Local": "http://localhost:5095",
+    "Docker": "http://localhost:8081",
+    "Swagger": "/swagger/index.html"
   },
 
   "Logging": {
@@ -161,9 +173,35 @@ Para este laboratorio se usó SQL Server Express local con autenticación integr
 }
 ```
 
-Esta configuración permite que la aplicación se conecte a la base de datos `persona_db` ubicada en la instancia local `SQLEXPRESS`.
+Esta configuración base evita dejar directamente la conexión local `localhost\\SQLEXPRESS` como configuración principal del proyecto.
 
-> Nota: si el proyecto se ejecuta desde Docker o desde otro equipo, esta cadena debe modificarse, ya que `localhost` dentro de un contenedor no apunta al equipo anfitrión sino al propio contenedor.
+### Archivo `appsettings.Development.json`
+
+El archivo `appsettings.Development.json` contiene la conexión local utilizada durante el desarrollo:
+
+```json
+{
+  "ConnectionStrings": {
+    "PersonaDbConnection": "Server=localhost\\SQLEXPRESS;Database=persona_db;Trusted_Connection=True;TrustServerCertificate=True"
+  },
+
+  "ApplicationUrls": {
+    "Local": "http://localhost:5095",
+    "Docker": "http://localhost:8081",
+    "Swagger": "/swagger/index.html"
+  }
+}
+```
+
+Esta configuración se usa cuando la aplicación se ejecuta en ambiente `Development`.
+
+Para activar este ambiente desde consola en Windows:
+
+```bash
+set ASPNETCORE_ENVIRONMENT=Development
+```
+
+> Nota: si el proyecto se ejecuta desde Docker, la cadena de conexión debe configurarse hacia un servidor SQL Server accesible desde el contenedor. Dentro de Docker, `localhost` hace referencia al propio contenedor y no al equipo anfitrión.
 
 ---
 
@@ -174,9 +212,10 @@ El proyecto puede ejecutarse desde Visual Studio 2022 o desde consola.
 ### Opción 1: Ejecutar desde Visual Studio
 
 1. Abrir la solución del proyecto.
-2. Verificar que la cadena de conexión apunte correctamente a SQL Server.
-3. Compilar la solución.
-4. Ejecutar el proyecto usando el perfil HTTP.
+2. Verificar que exista la base de datos `persona_db`.
+3. Verificar que la cadena local esté configurada en `appsettings.Development.json`.
+4. Compilar la solución.
+5. Ejecutar el proyecto usando el perfil HTTP.
 
 ### Opción 2: Ejecutar desde consola
 
@@ -186,7 +225,13 @@ Desde la carpeta raíz del proyecto:
 dotnet build
 ```
 
-Luego ejecutar:
+Luego definir el ambiente de desarrollo:
+
+```bash
+set ASPNETCORE_ENVIRONMENT=Development
+```
+
+Y ejecutar:
 
 ```bash
 dotnet .\bin\Debug\net7.0\personapi-dotnet.dll --urls "http://localhost:5095"
@@ -196,13 +241,6 @@ La aplicación queda disponible en:
 
 ```text
 http://localhost:5095
-```
-
-En caso de necesitar Swagger en ambiente de desarrollo, puede definirse el entorno así:
-
-```bash
-set ASPNETCORE_ENVIRONMENT=Development
-dotnet .\bin\Debug\net7.0\personapi-dotnet.dll --urls "http://localhost:5095"
 ```
 
 ---
@@ -353,20 +391,22 @@ personapi-dotnet    latest
 La aplicación fue ejecutada en contenedor mediante el siguiente comando:
 
 ```bash
-docker run -p 8080:80 personapi-dotnet
+docker run -p 8081:80 personapi-dotnet
 ```
 
-La aplicación quedó disponible desde Docker en:
+La aplicación queda disponible desde Docker en:
 
 ```text
-http://localhost:8080
+http://localhost:8081
 ```
 
-Con esto se validó correctamente la construcción y ejecución inicial de la imagen Docker.
+Con esto se valida correctamente la construcción y ejecución inicial de la imagen Docker.
 
 ### Nota sobre conexión a base de datos en Docker
 
-La cadena actual del proyecto está configurada para ejecución local:
+El contenedor puede iniciar correctamente la aplicación. Sin embargo, para consultar los módulos CRUD desde Docker se requiere que SQL Server sea accesible desde el contenedor.
+
+La conexión local de desarrollo está en `appsettings.Development.json`:
 
 ```json
 "Server=localhost\\SQLEXPRESS;Database=persona_db;Trusted_Connection=True;TrustServerCertificate=True"
@@ -374,9 +414,13 @@ La cadena actual del proyecto está configurada para ejecución local:
 
 Esta cadena funciona cuando la aplicación corre directamente en el equipo donde está instalado SQL Server Express.
 
-Si la aplicación se ejecuta dentro de Docker, la cadena de conexión debe ajustarse para apuntar a un servidor SQL Server accesible desde el contenedor. Por ejemplo, podría usarse una instancia SQL Server en otro contenedor, una IP del equipo anfitrión o una base de datos remota.
+Si la aplicación se ejecuta dentro de Docker, la conexión debe reemplazarse por una cadena válida hacia un servidor SQL Server externo o accesible desde contenedores. Por ejemplo, podría usarse:
 
-Por esta razón, aunque la aplicación inicia correctamente desde Docker, la operación completa con base de datos requiere configurar la conectividad hacia SQL Server si se desea ejecutar todo el sistema desde contenedores.
+```text
+Server=host.docker.internal,1433;Database=persona_db;User Id=sa;Password=SQL_PASSWORD;TrustServerCertificate=True
+```
+
+Esto requiere habilitar TCP/IP en SQL Server, abrir el puerto correspondiente y configurar autenticación SQL Server si se desea ejecutar el CRUD completamente desde Docker.
 
 ---
 
@@ -404,21 +448,9 @@ Luego se creó un túnel público con el siguiente comando:
 cloudflared tunnel --url http://localhost:5095
 ```
 
-Cloudflare Tunnel generó la siguiente URL pública temporal:
+Cloudflare Tunnel generó una URL pública temporal sobre el dominio `trycloudflare.com`.
 
-```text
-https://accomplished-wins-manga-excluding.trycloudflare.com
-```
-
-Desde esta URL se validó el acceso externo a las vistas MVC y a Swagger:
-
-```text
-https://accomplished-wins-manga-excluding.trycloudflare.com/Personas
-```
-
-```text
-https://accomplished-wins-manga-excluding.trycloudflare.com/swagger/index.html
-```
+Desde esta URL se validó el acceso externo a las vistas MVC y a Swagger.
 
 > Importante: este despliegue es temporal y depende de que la aplicación local y el túnel de Cloudflare estén activos. No corresponde a un despliegue productivo en nube, sino a una exposición pública temporal para validación externa del laboratorio.
 
@@ -447,6 +479,25 @@ Durante el desarrollo se realizaron commits por cada avance principal:
 - Actualización de documentación en README.
 - Exposición temporal de la aplicación mediante Cloudflare Tunnel.
 - Validación del Dockerfile mediante construcción y ejecución de imagen Docker.
+- Separación de configuración por ambiente mediante `appsettings.json` y `appsettings.Development.json`.
+
+### URL del repositorio
+
+```text
+https://github.com/DiegoPUJ/personapi-dotnet
+```
+
+### URL del TAG final
+
+```text
+https://github.com/DiegoPUJ/personapi-dotnet/releases/tag/v1.0.1
+```
+
+### Código fuente del TAG
+
+```text
+https://github.com/DiegoPUJ/personapi-dotnet/tree/v1.0.1
+```
 
 ---
 
@@ -497,6 +548,7 @@ personapi-dotnet/
 ├── wwwroot/
 │
 ├── appsettings.json
+├── appsettings.Development.json
 ├── database.sql
 ├── Dockerfile
 ├── Program.cs
@@ -521,11 +573,12 @@ personapi-dotnet/
 | Endpoints REST | Completado |
 | Swagger | Completado |
 | Dockerfile | Validado correctamente mediante construcción y ejecución de imagen Docker |
+| Configuración por ambiente | Completado |
 | Documentación README | Completado |
 | Despliegue local | Completado |
 | Túnel público temporal | Completado |
 | Código fuente en GitHub | Completado |
-| TAG final | Pendiente |
+| TAG final `v1.0.1` | Completado |
 
 ---
 
